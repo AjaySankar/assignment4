@@ -1,61 +1,63 @@
-const express = require('express')
-const { ApolloServer, gql } = require('apollo-server-express');
+const express = require('express');
+const { ApolloServer } = require('apollo-server-express');
 const cors = require('cors');
-const fs = require('fs')
+const fs = require('fs');
 require('dotenv').config();
-const typeDefs = fs.readFileSync('./schema.graphql',{encoding:'utf-8'})
-const defaultProductInfo = {id: 0, name: '', category: 'NA', price: 0, image: ''}
+
+const typeDefs = fs.readFileSync('./schema.graphql', { encoding: 'utf-8' });
+const defaultProductInfo = {
+  id: 0, name: '', category: 'NA', price: 0, image: ''
+};
 let db = null;
 const { MongoClient } = require('mongodb');
 
 function getProductsFromMongo() {
-  if(!db) {
-    throw "Empty database connection!!";
+  if (!db) {
+    throw 'Empty database connection!!';
   }
   const promise = new Promise((resolve, reject) => {
     const collection = db.collection('products');
     collection.find({})
       .toArray((err, products) => {
-        if(err) {
-          reject(err)
+        if (err) {
+          reject(err);
         }
         else {
-          resolve(products)
+          resolve(products);
         }
     });
-  })
+  });
   return promise;
 }
 
 const resolvers = {
   Query: {
-    products: () => products,
     getProducts: () => {
       try {
         return getProductsFromMongo();
       }
-      catch(error) {
-        console.log(`Fetching products from mongo db failed ${error}`)
-        return []
+      catch (error) {
+        console.log(`Fetching products from mongo db failed ${error}`);
+        return [];
       }
     }
   },
   Mutation: {
     addProduct: (root, args) => {
-      if(!db) {
-        throw "Empty database connection!!";
+      if (!db) {
+        throw 'Empty database connection!!';
       }
       const collection = db.collection('products');
       collection.countDocuments({}).then((count) => {
-        const newProduct = Object.assign({}, defaultProductInfo, args.product || {}, {'id': count + 1});
-        const promise = collection.insertOne(newProduct)
-        promise.then(({insertedId}) => {
-          const id = newProduct.id
-          collection.findOne({'id': id})
-          .then((product) => product)
-        })
+        const newProduct = Object.assign({}, defaultProductInfo, args.product || {}, { 'id': count + 1 });
+        const promise = collection.insertOne(newProduct);
+        promise.then(({ insertedId }) => {
+          const id = newProduct.id;
+          collection.findOne({ 'id': id })
+          .then((product) => product);
+        });
       })
-      .catch(error => console.log(`Product insertion failed: ${error}`))
+      .catch((error) => console.log(`Product insertion failed: ${error}`));
     }
   }
 };
@@ -68,7 +70,7 @@ app.use(cors());
 
 server.applyMiddleware({ app });
 
-const port = process.env.API_SERVER_PORT || 3000
+const port = process.env.API_SERVER_PORT || 3000;
 app.listen(port, () => {
   console.log(`Server started listening on port ${port}`);
   const url = process.env.DB_URL || 'mongodb://localhost/products';
@@ -76,5 +78,5 @@ app.listen(port, () => {
   client.connect().then(() => {
       db = client.db();
   })
-  .catch((error) => console.log(error))
-})
+  .catch((error) => console.log(error));
+});
