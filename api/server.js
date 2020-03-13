@@ -8,24 +8,23 @@ const defaultProductInfo = {id: 0, name: '', category: 'NA', price: 0, image: ''
 let db = null;
 const { MongoClient } = require('mongodb');
 
-const products = []
-
 function getProductsFromMongo() {
-  if(db) {
-    const p = new Promise((resolve, reject) => {
-      const collection = db.collection('products');
-      collection.find({})
-        .toArray((err, products) => {
-          if(err) {
-            reject(err)
-          }
-          else {
-            resolve(products)
-          }
-      });
-    })
-    return p;
+  if(!db) {
+    throw "Empty database connection!!";
   }
+  const promise = new Promise((resolve, reject) => {
+    const collection = db.collection('products');
+    collection.find({})
+      .toArray((err, products) => {
+        if(err) {
+          reject(err)
+        }
+        else {
+          resolve(products)
+        }
+    });
+  })
+  return promise;
 }
 
 const resolvers = {
@@ -44,9 +43,17 @@ const resolvers = {
   Mutation: {
     addProduct: (root, args) => {
       const newProduct = Object.assign({}, defaultProductInfo, args.product || {}, {'id': Math.floor((Math.random() * 1000000) + 1)});
-      products.push(newProduct)
-      const id = newProduct.id
-      return find(products, (product) => product.id == id)
+      if(!db) {
+        throw "Empty database connection!!";
+      }
+      const collection = db.collection('products');
+      const promise = collection.insertOne(newProduct)
+      promise.then(({insertedId}) => {
+        const id = newProduct.id
+        collection.findOne({'id': id})
+        .then((product) => product)
+      })
+      .catch(error => console.log(`Product insertion failed: ${error}`))
     }
   }
 };
