@@ -8,36 +8,38 @@ const defaultProductInfo = {id: 0, name: '', category: 'NA', price: 0, image: ''
 let db = null;
 const { MongoClient } = require('mongodb');
 
-const products = [
-  {
-    id: 1,
-    name: 'Blue Shirt',
-    category: 'Shirts',
-    price: '12.30',
-    image: 'https://google.com/',
-  },
-  {
-    id: 2,
-    name: 'Black Jeans',
-    category: 'Jeans',
-    price: '17.99',
-    image: 'https://youtube.com/',
-  },
-];
+const products = []
+
+function getProductsFromMongo() {
+  if(db) {
+    const p = new Promise((resolve, reject) => {
+      const collection = db.collection('products');
+      collection.find({})
+        .toArray((err, products) => {
+          if(err) {
+            reject(err)
+          }
+          else {
+            resolve(products)
+          }
+      });
+    })
+    return p;
+  }
+}
 
 const resolvers = {
   Query: {
     products: () => products,
     getProducts: () => {
-      if(db) {
-        const collection = db.collection('employees');
-        collection.find({})
-          .toArray(function(err, docs) {
-            console.log('Result of find now:\n', docs);
-        });
+      try {
+        return getProductsFromMongo();
       }
-      return products
-    },
+      catch(error) {
+        console.log(`Fetching products from mongo db failed ${error}`)
+        return []
+      }
+    }
   },
   Mutation: {
     addProduct: (root, args) => {
@@ -59,8 +61,8 @@ server.applyMiddleware({ app });
 
 app.listen(4000, () => {
   console.log("Server started listening on port 4000");
-  const url = 'mongodb://localhost/issuetracker';
-  const client = new MongoClient(url, { useNewUrlParser: true });
+  const url = 'mongodb://localhost/products';
+  const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
   client.connect().then(() => {
       db = client.db();
   })
