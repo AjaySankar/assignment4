@@ -1,8 +1,8 @@
-const find = require('lodash/find')
 const express = require('express')
 const { ApolloServer, gql } = require('apollo-server-express');
 const cors = require('cors');
 const fs = require('fs')
+require('dotenv').config();
 const typeDefs = fs.readFileSync('./schema.graphql',{encoding:'utf-8'})
 const defaultProductInfo = {id: 0, name: '', category: 'NA', price: 0, image: ''}
 let db = null;
@@ -68,9 +68,10 @@ app.use(cors());
 
 server.applyMiddleware({ app });
 
-app.listen(4000, () => {
-  console.log("Server started listening on port 4000");
-  const url = 'mongodb://localhost/products';
+const port = process.env.API_SERVER_PORT || 3000
+app.listen(port, () => {
+  console.log(`Server started listening on port ${port}`);
+  const url = process.env.DB_URL || 'mongodb://localhost/products';
   const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
   client.connect().then(() => {
       db = client.db();
