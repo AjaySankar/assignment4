@@ -5,6 +5,9 @@ const cors = require('cors');
 const fs = require('fs')
 const typeDefs = fs.readFileSync('./schema.graphql',{encoding:'utf-8'})
 const defaultProductInfo = {id: 0, name: '', category: 'NA', price: 0, image: ''}
+let db = null;
+const { MongoClient } = require('mongodb');
+
 const products = [
   {
     id: 1,
@@ -25,7 +28,16 @@ const products = [
 const resolvers = {
   Query: {
     products: () => products,
-    getProducts: () => products,
+    getProducts: () => {
+      if(db) {
+        const collection = db.collection('employees');
+        collection.find({})
+          .toArray(function(err, docs) {
+            console.log('Result of find now:\n', docs);
+        });
+      }
+      return products
+    },
   },
   Mutation: {
     addProduct: (root, args) => {
@@ -46,5 +58,11 @@ app.use(cors());
 server.applyMiddleware({ app });
 
 app.listen(4000, () => {
-  console.log("Server started listening on port 4000")
+  console.log("Server started listening on port 4000");
+  const url = 'mongodb://localhost/issuetracker';
+  const client = new MongoClient(url, { useNewUrlParser: true });
+  client.connect().then(() => {
+      db = client.db();
+  })
+  .catch((error) => console.log(error))
 })
