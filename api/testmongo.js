@@ -10,9 +10,7 @@ client.connect().then(() => {
     //   .toArray(function(err, docs) {
     //     console.log('Result of find:\n', docs);
     // });
-    const ret = collection.findOne({
-      "id" : 5
-    })
+    const ret = collection.count({})
     ret.then((result) => console.log(result))
 })
 .catch((error) => console.log(error))

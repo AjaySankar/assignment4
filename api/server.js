@@ -42,16 +42,18 @@ const resolvers = {
   },
   Mutation: {
     addProduct: (root, args) => {
-      const newProduct = Object.assign({}, defaultProductInfo, args.product || {}, {'id': Math.floor((Math.random() * 1000000) + 1)});
       if(!db) {
         throw "Empty database connection!!";
       }
       const collection = db.collection('products');
-      const promise = collection.insertOne(newProduct)
-      promise.then(({insertedId}) => {
-        const id = newProduct.id
-        collection.findOne({'id': id})
-        .then((product) => product)
+      collection.countDocuments({}).then((count) => {
+        const newProduct = Object.assign({}, defaultProductInfo, args.product || {}, {'id': count + 1});
+        const promise = collection.insertOne(newProduct)
+        promise.then(({insertedId}) => {
+          const id = newProduct.id
+          collection.findOne({'id': id})
+          .then((product) => product)
+        })
       })
       .catch(error => console.log(`Product insertion failed: ${error}`))
     }
