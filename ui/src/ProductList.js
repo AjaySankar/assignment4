@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+
 import React, { Component } from "react"
 import { graphql } from "react-apollo"
 import { gql } from "apollo-boost"
@@ -25,6 +27,7 @@ class ProductList extends Component {
   }
 
   handleSave() {
+    // eslint-disable-next-line no-unused-vars
     this.setState((prevState) => {
       return { ...this.state }
     })
@@ -62,52 +65,44 @@ class ProductList extends Component {
   }
 }
 
-class ProductRow extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
-  render() {
-    return (
-      <tr>
-        <td> {this.props.product.name || " "} </td>
-        <td> ${this.props.product.price || " "} </td>
-        <td> {this.props.product.category || " "} </td>
-        <td>
+function ProductRow(props) {
+  const {
+    product: { price = "", name = "", image = "#", category = "" },
+  } = props
+  return (
+    <tr>
+      <td> {name} </td>
+      <td> ${price} </td>
+      <td> {category} </td>
+      <td>
+        {" "}
+        <a href={image} target="__blank">
           {" "}
-          <a href={this.props.product.image || "#"} target="__blank">
-            {" "}
-            View{" "}
-          </a>{" "}
-        </td>
-      </tr>
-    )
-  }
+          View{" "}
+        </a>{" "}
+      </td>
+    </tr>
+  )
 }
 
-class ProductTable extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
-  render() {
-    const rows = this.props.products.map((productInfo) => {
-      return <ProductRow key={productInfo.id} product={productInfo} />
-    })
-    return (
-      <table>
-        <thead>
-          <tr>
-            <th> Product Name </th>
-            <th> Price </th>
-            <th> Category </th>
-            <th> Image </th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </table>
-    )
-  }
+function ProductTable(props) {
+  const { products = [] } = props
+  const rows = products.map((productInfo) => {
+    return <ProductRow key={productInfo.id} product={productInfo} />
+  })
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th> Product Name </th>
+          <th> Price </th>
+          <th> Category </th>
+          <th> Image </th>
+        </tr>
+      </thead>
+      <tbody>{rows}</tbody>
+    </table>
+  )
 }
 
 export default graphql(getProductsQuery, { name: "allProductsQuery" })(

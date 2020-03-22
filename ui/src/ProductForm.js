@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable react/prop-types */
 
 import React, { Component } from "react"
 import { graphql } from "react-apollo"
