@@ -41,13 +41,10 @@ class ProductForm extends Component {
     }
   }
 
-  handleChange(e) {
-    const { target } = e
-    const { value } = target
-    const { name } = target
-    this.setState((prevState) => {
-      prevState.product[name] = value
-      return { product: prevState.product }
+  handleChange({ target }) {
+    const { name, value } = target
+    this.setState(({ product: prevProduct }) => {
+      return { product: { ...prevProduct, ...{ [name]: value } } }
     })
   }
 
