@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
-import ApolloClient from 'apollo-boost';
-import {ApolloProvider} from 'react-apollo';
-import ProductList from './ProductList';
+import React, { Component } from "react"
+import ApolloClient from "apollo-boost"
+import { ApolloProvider } from "react-apollo"
+import ProductList from "./ProductList"
 
-import './App.css';
+import "./App.css"
 
 const client = new ApolloClient({
-  uri: 'http://localhost:3000/graphql'
+  uri: "http://localhost:3000/graphql",
 })
 
 class App extends Component {
@@ -16,12 +16,12 @@ class App extends Component {
         <div>
           <h1> My Company Inventory </h1>
           <h3> Showing all available products </h3>
-          <hr/>
-          <ProductList/>
+          <hr />
+          <ProductList />
         </div>
       </ApolloProvider>
-    );
+    )
   }
 }
 
-export default App;
+export default App
