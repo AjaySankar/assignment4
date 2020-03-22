@@ -35,7 +35,6 @@ class ProductForm extends Component {
     this.handleSave = this.handleSave.bind(this)
     this.state = {
       product: this.props.formInput || { ...RESET_VALUES },
-      errors: {},
     }
   }
 
@@ -67,7 +66,6 @@ class ProductForm extends Component {
         // reset the form values to blank after submitting
         this.setState({
           product: { ...RESET_VALUES },
-          errors: {},
         })
       })
       .catch((error) => {
@@ -79,11 +77,14 @@ class ProductForm extends Component {
   }
 
   render() {
+    const {
+      product: { price, name, image },
+    } = this.state
     return (
       <form>
         <label>Category</label>
         <label>Price Per Unit </label>
-        <select name="category" onChange={this.handleChange}>
+        <select name="category" onBlur={this.handleChange}>
           <option value="Shirts">Shirts</option>
           <option value="Jeans">Jeans</option>
           <option value="Jackets">Jackets</option>
@@ -94,7 +95,7 @@ class ProductForm extends Component {
           type="text"
           name="price"
           onChange={this.handleChange}
-          value={this.state.product.price}
+          value={price}
         />
         <label>Product Name </label>
         <label>Image URL </label>
@@ -102,13 +103,13 @@ class ProductForm extends Component {
           type="text"
           name="name"
           onChange={this.handleChange}
-          value={this.state.product.name}
+          value={name}
         />
         <input
           type="text"
           name="image"
           onChange={this.handleChange}
-          value={this.state.product.image}
+          value={image}
         />
         <input type="submit" value="Add Product" onClick={this.handleSave} />
       </form>
