@@ -65,6 +65,7 @@ class ProductForm extends Component {
     promise
       // eslint-disable-next-line no-unused-vars
       .then(({ data = {} }) => {
+        // On succesful product save, refresh the product table
         onSave()
         // reset the form values to blank after submitting
         this.setState({

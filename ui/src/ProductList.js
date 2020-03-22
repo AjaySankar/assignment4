@@ -27,21 +27,22 @@ class ProductList extends Component {
   }
 
   handleSave() {
-    // eslint-disable-next-line no-unused-vars
-    this.setState((prevState) => {
-      return { ...this.state }
-    })
+    this.setState((prevState) => ({ ...prevState }))
   }
 
   render() {
-    if (this.props.allProductsQuery && this.props.allProductsQuery.loading) {
+    const { formData } = this.state
+    const {
+      allProductsQuery: { loading, error, getProducts },
+    } = this.props
+    if (loading) {
       return (
         <div>
           <p> Loading Products... </p>
         </div>
       )
     }
-    if (this.props.allProductsQuery && this.props.allProductsQuery.error) {
+    if (error) {
       return (
         <div>
           <p> Error has occured while fetching products ... </p>
@@ -50,14 +51,12 @@ class ProductList extends Component {
     }
     return (
       <div>
-        <ProductTable
-          products={this.props.allProductsQuery.getProducts || []}
-        />
+        <ProductTable products={getProducts || []} />
         <h3> Add a new product to inventory </h3>
         <hr />
         <ProductForm
-          key={JSON.stringify(this.state.formData || {})}
-          formInput={this.state.formData}
+          key={JSON.stringify(formData || {})}
+          formInput={formData}
           onSave={this.handleSave}
         />
       </div>
