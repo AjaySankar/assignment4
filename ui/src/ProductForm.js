@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
+
 import React, { Component } from "react"
 import { graphql } from "react-apollo"
 import { gql } from "apollo-boost"
@@ -33,8 +35,9 @@ class ProductForm extends Component {
     super(props)
     this.handleChange = this.handleChange.bind(this)
     this.handleSave = this.handleSave.bind(this)
+    const { formInput } = this.props
     this.state = {
-      product: this.props.formInput || { ...RESET_VALUES },
+      product: formInput || { ...RESET_VALUES },
     }
   }
 
@@ -49,10 +52,11 @@ class ProductForm extends Component {
   }
 
   handleSave(e) {
-    this.props.onSave(this.state.product)
-    const { category, name, image } = this.state.product
-    const price = parseFloat(this.state.product.price.substring(1)) || 0
-    const promise = this.props.addProduct({
+    const { product } = this.state
+    const { category, name, image } = product
+    const price = parseFloat(product.price.substring(1)) || 0
+    const { addProduct, onSave } = this.props
+    const promise = addProduct({
       variables: {
         category,
         name,
@@ -61,8 +65,9 @@ class ProductForm extends Component {
       },
     })
     promise
+      // eslint-disable-next-line no-unused-vars
       .then(({ data = {} }) => {
-        this.props.onSave()
+        onSave()
         // reset the form values to blank after submitting
         this.setState({
           product: { ...RESET_VALUES },
